@@ -1,4 +1,4 @@
-package Enums;
+package com.messenger.queue.Enums;
 
 public enum EmergencyType {
     HIGH,

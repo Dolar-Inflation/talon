@@ -9,7 +9,7 @@ import lombok.Setter;
 @Data
 @Getter
 @Setter
-public class TalonDTO {
+public class TicketDTO {
 
 
     private String id;

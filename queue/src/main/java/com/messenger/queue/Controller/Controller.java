@@ -1,16 +1,19 @@
-package Controller;
+package com.messenger.queue.Controller;
 
-import DTO.TalonDTO;
-import org.springframework.web.bind.annotation.GetMapping;
+import com.messenger.queue.DTO.TicketDTO;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class Controller {
 
-    @GetMapping("get")
-    public String get(@RequestBody TalonDTO talonDTO) {
-        return "Hello World"+talonDTO;
+    @PostMapping("/get")
+    public String get(@RequestBody TicketDTO ticketDTO) {
+        System.out.println("получил"+ticketDTO);
+        return "Hello World! ServiceType=" + ticketDTO.getServiceType() +
+                ", EmergencyType=" + ticketDTO.getEmergencyType() +
+                ", Id=" + ticketDTO.getId();
 
 
     }
