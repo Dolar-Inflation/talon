@@ -1,6 +1,6 @@
-package DTO;
+package com.messenger.talon.DTO;
 
-import Enums.EmergencyType;
+import com.messenger.talon.Enums.EmergencyType;
 
 
 import lombok.Data;
@@ -17,6 +17,7 @@ public class TicketDTO {
     private String id = UUID.randomUUID().toString();
     private String serviceType;
     private EmergencyType emergencyType;
+    private Long TimeCreated=System.currentTimeMillis();
 
 
 

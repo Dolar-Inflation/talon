@@ -1,6 +1,6 @@
-package Controller;
+package com.messenger.talon.Controller;
 
-import DTO.TicketDTO;
+import com.messenger.talon.DTO.TicketDTO;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,9 +17,9 @@ public class Controller {
     }
 
     @PostMapping("/send")
-    public String sendTicket(@RequestBody TicketDTO ticketDTO) {
+    public String sendTicket(@RequestBody TicketDTO ticketDTO) throws InterruptedException {
 
-
+        Thread.sleep(6000);
         restTemplate.postForObject( "http://queue/get", ticketDTO, String.class );
 
         return ""+ticketDTO;

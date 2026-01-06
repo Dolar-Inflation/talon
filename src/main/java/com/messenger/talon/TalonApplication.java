@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TalonApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TalonApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TalonApplication.class, args);
+    }
 
 }
