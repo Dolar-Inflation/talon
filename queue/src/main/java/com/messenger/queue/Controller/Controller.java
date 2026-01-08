@@ -2,41 +2,52 @@ package com.messenger.queue.Controller;
 
 import com.messenger.queue.DTO.TicketDTO;
 import com.messenger.queue.Enums.EmergencyType;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 public class Controller {
+   private final AtomicLong counter = new AtomicLong();
+   private final List<TicketDTO> que = new ArrayList<>();
+    private final SimpMessagingTemplate messagingTemplate;
+
+    public Controller(SimpMessagingTemplate messagingTemplate) {
+        this.messagingTemplate = messagingTemplate;
+    }
 
     @PostMapping("/get")
-    public String get(@RequestBody TicketDTO ticketDTO) {
+    public void get(@RequestBody TicketDTO ticketDTO) {
 
-        List<TicketDTO> que = new ArrayList<>();
+
         que.add(ticketDTO);
-        AtomicLong counter = new AtomicLong();
-        counter.incrementAndGet();
+        Long ticletNumber = counter.incrementAndGet();
+        ticketDTO.setQueueNumber(ticletNumber);
         Long now = System.currentTimeMillis();
 
-//        TicketDTO firstel=que.get(0);
-
-        for(TicketDTO ticket : que) {
-            Long created = ticketDTO.getTimeCreated();
-            if (now - created > 5000 && ticket.getEmergencyType() != EmergencyType.HIGH) {
-                ticket.setEmergencyType(ticket.getEmergencyType().next());
-                ticket.setTimeCreated(System.currentTimeMillis());
-            }
-        }
-        System.out.println("получил"+counter+ticketDTO);
-        return "Hello World! ServiceType=" + ticketDTO.getServiceType() +
-                ", EmergencyType=" + ticketDTO.getEmergencyType() +
-                ", Id=" + ticketDTO.getId();
 
 
+
+
+            System.out.println("получил" + ticketDTO.getQueueNumber() + ticketDTO.getServiceType() + ticketDTO.getEmergencyType());
+
+        messagingTemplate.convertAndSend("/queue/tickets", que);
+
+
+
+    }
+
+    @GetMapping("/queue")
+    public List<TicketDTO> getQueue() {
+
+        return que;
     }
 
 }

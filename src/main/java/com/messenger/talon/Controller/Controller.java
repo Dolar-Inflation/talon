@@ -19,7 +19,7 @@ public class Controller {
     @PostMapping("/send")
     public String sendTicket(@RequestBody TicketDTO ticketDTO) throws InterruptedException {
 
-        Thread.sleep(6000);
+//        Thread.sleep(6000);
         restTemplate.postForObject( "http://queue/get", ticketDTO, String.class );
 
         return ""+ticketDTO;

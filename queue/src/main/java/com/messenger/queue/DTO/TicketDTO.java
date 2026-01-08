@@ -16,6 +16,7 @@ public class TicketDTO {
     private String serviceType;
     private EmergencyType emergencyType;
     private Long TimeCreated;
+    private Long queueNumber;
 
 
 }
