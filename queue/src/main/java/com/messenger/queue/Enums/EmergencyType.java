@@ -1,6 +1,6 @@
 package com.messenger.queue.Enums;
 
-import javafx.scene.layout.Priority;
+
 
 public enum EmergencyType {
     HIGH,

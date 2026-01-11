@@ -12,10 +12,26 @@
             margin: 5px 0;
             background: #f9f9f9;
         }
+        #processBtn {
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        #processBtn:hover {
+            background: #45a049;
+        }
     </style>
 </head>
 <body>
+
 <h2>Очередь тикетов (Live)</h2>
+
+<button id="processBtn" onclick="processTicket()">Обработан</button>
+
 <div id="tickets"></div>
 
 <!-- SockJS + STOMP -->
@@ -52,6 +68,15 @@
                 <strong>Priority:</strong> ${ticket.emergencyType}
             `;
             container.appendChild(div);
+        });
+    }
+
+    // 🔥 Кнопка "Обработан" вызывает /exec
+    function processTicket() {
+        fetch('http://localhost:8082/exec', {
+            method: 'POST'
+        }).then(() => {
+            console.log("Ticket processed");
         });
     }
 </script>
