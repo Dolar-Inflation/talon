@@ -3,9 +3,19 @@ package com.messenger.queue.Enums;
 
 
 public enum EmergencyType {
-    HIGH,
-    MEDIUM,
-    LOW;
+    HIGH(1),
+    MEDIUM(2),
+    LOW(3);
+
+    private final Integer PriorityValue;
+
+    EmergencyType( Integer priorityValue) {
+        PriorityValue = priorityValue;
+    }
+
+    public Integer getPriorityValue() {
+        return PriorityValue;
+    }
 
     public EmergencyType next() {
         switch (this) {
@@ -13,8 +23,9 @@ public enum EmergencyType {
                 return MEDIUM;
             case MEDIUM:
                 return HIGH;
-            default:
-                return HIGH;
+
         }
+        return this;
     }
-    }
+}
+

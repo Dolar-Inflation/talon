@@ -4,6 +4,7 @@ import com.messenger.queue.DTO.TicketDTO;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 @Service
 public class QueueService {
@@ -15,9 +16,17 @@ public class QueueService {
     }
 
     public synchronized List<TicketDTO> getAllTickets() {
-        return queue;
+
+        return new ArrayList<>(queue);
+
     }
     public synchronized void removeTicket() {
         queue.remove(0);
+    }
+
+
+    public synchronized void sortTickets() {
+        queue.sort(Comparator.comparingInt(t-> t.getEmergencyType().getPriorityValue()));
+
     }
 }

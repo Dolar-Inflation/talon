@@ -2,6 +2,7 @@ package com.messenger.queue.Controller;
 
 import com.messenger.queue.DTO.TicketDTO;
 import com.messenger.queue.Enums.EmergencyType;
+import com.messenger.queue.Services.QueueCheckerService;
 import com.messenger.queue.Services.QueueService;
 import com.messenger.queue.Services.TicketExecutor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -22,13 +23,15 @@ public class Controller {
     private final QueueService queueService;
     private final TicketExecutor ticketExecutor;
     private final SimpMessagingTemplate messagingTemplate;
+    private final QueueCheckerService queueCheckerService;
 
     public Controller(QueueService queueService,
                       TicketExecutor ticketExecutor,
-                      SimpMessagingTemplate messagingTemplate) {
+                      SimpMessagingTemplate messagingTemplate, QueueCheckerService queueCheckerService) {
         this.queueService = queueService;
         this.ticketExecutor = ticketExecutor;
         this.messagingTemplate = messagingTemplate;
+        this.queueCheckerService = queueCheckerService;
     }
 
     @PostMapping("/get")
@@ -37,12 +40,14 @@ public class Controller {
         ticketDTO.setTimeCreated(System.currentTimeMillis());
 
         queueService.addTicket(ticketDTO);
-
+        queueCheckerService.checkQueue();
         messagingTemplate.convertAndSend("/queue/tickets", queueService.getAllTickets());
     }
 
     @GetMapping("/queue")
     public List<TicketDTO> getQueue() {
+        queueCheckerService.checkQueue();
+
         return queueService.getAllTickets();
     }
 
