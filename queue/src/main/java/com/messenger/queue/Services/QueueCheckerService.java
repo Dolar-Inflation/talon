@@ -3,34 +3,52 @@ package com.messenger.queue.Services;
 import com.messenger.queue.Controller.Controller;
 import com.messenger.queue.DTO.TicketDTO;
 import com.messenger.queue.Enums.EmergencyType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class QueueCheckerService {
-
-   private final QueueService queueService;
-   private final SimpMessagingTemplate messagingTemplate;
+//TODO создать несколько отдельных html страничек + реализовать более адекватный вариант нескольких очередей (без костыльного создания нескольких массивов и нескольких атомарных счётчиков)
+    @Autowired
+    private final QueueService queueService;
+    private final SimpMessagingTemplate messagingTemplate;
 
     public QueueCheckerService(QueueService queueService, SimpMessagingTemplate messagingTemplate) {
         this.queueService = queueService;
 
         this.messagingTemplate = messagingTemplate;
     }
-//TODO разобраться с сортирокой и отправкой списка в вебсокет
+
+
     @Scheduled(fixedRate = 10000)
-    public List<TicketDTO> checkQueue() {
+    public void checkQueue() {
+
+
+        List<TicketDTO> ticket1 = queueService.getAllTickets();
+        List<TicketDTO> ticket2 = queueService.getQueue2();
+        List<TicketDTO> ticket3 = queueService.getQueue3();
+
+
+
+        check(ticket1);
+        check(ticket2);
+        check(ticket3);
+        queueService.sortTickets();
+
+        Map<String, List<TicketDTO>> result = queueService.getAllQueuesAsMap();
+
+
+        messagingTemplate.convertAndSend("/queue/tickets", result);
+
+
+    }
+
+    public void check(List<TicketDTO> tickets) {
         Long now = System.currentTimeMillis();
-        List<TicketDTO> tickets = queueService.getAllTickets();
-
-
-
-
-
         for (TicketDTO ticket : tickets) {
 
             Long created = ticket.getTimeCreated();
@@ -42,17 +60,11 @@ public class QueueCheckerService {
                 System.out.println("Повышен приоритет: " + ticket.getQueueNumber() + " " + ticket.getServiceType() + " " + ticket.getEmergencyType());
 
 
-            }
-            else {
-                System.out.println("<UNK> <UNK>: "+tickets + ticket.getQueueNumber() + " " + ticket.getServiceType()+""+ticket.getEmergencyType());
+            } else {
+                System.out.println("<UNK> <UNK>: " + tickets + ticket.getQueueNumber() + " " + ticket.getServiceType() + " " + ticket.getEmergencyType());
             }
 
         }
-        queueService.sortTickets();
-        messagingTemplate.convertAndSend("/queue/tickets", queueService.getAllTickets());
 
-        return tickets;
     }
-
-
 }

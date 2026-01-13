@@ -2,10 +2,13 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Очередь тикетов</title>
+    <title>Очереди тикетов</title>
     <style>
-        body { font-family: Arial, sans-serif; }
-        #tickets { margin-top: 20px; }
+        body { font-family: Arial, sans-serif; display: flex; gap: 30px; }
+        .column {
+            width: 30%;
+        }
+        h2 { margin-bottom: 10px; }
         .ticket {
             border: 1px solid #ccc;
             padding: 10px;
@@ -28,21 +31,32 @@
 </head>
 <body>
 
-<h2>Очередь тикетов (Live)</h2>
+<div class="column">
+    <h2>Очередь 1 (SERVER)</h2>
+    <div id="queue1"></div>
+</div>
+
+<div class="column">
+    <h2>Очередь 2 (PC)</h2>
+    <div id="queue2"></div>
+</div>
+
+<div class="column">
+    <h2>Очередь 3 (INTERNET)</h2>
+    <div id="queue3"></div>
+</div>
 
 <button id="processBtn" onclick="processTicket()">Обработан</button>
-
-<div id="tickets"></div>
 
 <!-- SockJS + STOMP -->
 <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
 
 <script>
-    // загрузка списка при открытии страницы
+    // загрузка очередей при открытии страницы
     fetch('http://localhost:8082/queue')
         .then(response => response.json())
-        .then(tickets => renderTickets(tickets));
+        .then(data => renderQueues(data));
 
     const socket = new SockJS('http://localhost:8082/ws');
     const stompClient = Stomp.over(socket);
@@ -50,14 +64,21 @@
     stompClient.connect({}, () => {
         console.log("Connected to WebSocket");
         stompClient.subscribe('/queue/tickets', (message) => {
-            const tickets = JSON.parse(message.body);
-            renderTickets(tickets);
+            const data = JSON.parse(message.body);
+            renderQueues(data);
         });
     });
 
-    function renderTickets(tickets) {
-        const container = document.getElementById("tickets");
+    function renderQueues(data) {
+        renderQueue("queue1", data.queue1);
+        renderQueue("queue2", data.queue2);
+        renderQueue("queue3", data.queue3);
+    }
+
+    function renderQueue(elementId, tickets) {
+        const container = document.getElementById(elementId);
         container.innerHTML = "";
+
         tickets.forEach(ticket => {
             const div = document.createElement("div");
             div.className = "ticket";
@@ -71,11 +92,12 @@
         });
     }
 
-
-    // Кнопка "Обработан" вызывает /exec
+    // Кнопка "Обработан"
     function processTicket() {
         fetch('http://localhost:8082/exec', {
-            method: 'POST'
+            method: 'POST',
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ serviceType: "SERVER" }) // пример
         }).then(() => {
             console.log("Ticket processed");
         });
